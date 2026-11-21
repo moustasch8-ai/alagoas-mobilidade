@@ -9,26 +9,34 @@ Aplicação web inicial para conectar passageiros e motoristas nos 102 municípi
 
 ## Configuração
 1. Abra o projeto Supabase: https://supabase.com/dashboard/project/lmddodyzurpxswvnfsnv
-2. No SQL Editor, execute todo o conteúdo de `supabase/schema.sql`.
-3. Confira em Authentication → Providers se e-mail/senha está habilitado. Se a confirmação de e-mail estiver ativa, o usuário deverá confirmar o endereço antes de entrar.
+2. O esquema inicial já foi aplicado. O arquivo `supabase/schema.sql` documenta as tabelas e políticas instaladas.
+3. Em Authentication → Providers, confira se e-mail/senha está habilitado. Com confirmação de e-mail ativa, o usuário deverá confirmar o endereço.
 4. Em Authentication → URL Configuration, adicione a URL publicada do site às Site URL e Redirect URLs.
-5. Publique o repositório pelo GitHub Pages (Settings → Pages → Deploy from a branch → main → /(root)) ou conecte-o a um serviço de hospedagem estática.
+5. Publique pelo GitHub Pages (Settings → Pages → Deploy from a branch → main → /(root)) ou conecte o repositório a uma hospedagem estática.
 
-A URL e a chave publishable já estão em `supabase-config.js`. Essa chave é própria para cliente público; nunca coloque uma chave `service_role` ou secret no navegador.
+A URL e a chave publishable já estão em `supabase-config.js`. A chave é própria para cliente público; nunca coloque uma chave `service_role` ou secret no navegador.
 
 ## Funcionalidades iniciais
 - Cadastro e login por e-mail e senha
-- Perfil passageiro/motorista definido no cadastro
 - Solicitação de corrida com origem, destino, município e observações
-- Motoristas autenticados podem visualizar solicitações abertas e aceitar uma corrida
-- Passageiros visualizam suas solicitações; motoristas visualizam corridas abertas e as que aceitaram
+- Histórico de solicitações do passageiro
+- Estrutura de aceitação de corridas por motoristas aprovados
+
+## Aprovação de motoristas
+Por segurança, todo novo cadastro recebe papel efetivo de passageiro. Quem solicitar cadastro como motorista fica com `role_requested = 'driver'`, mas não recebe permissão para aceitar corridas automaticamente. Após verificar documentos e habilitação fora do app, um administrador pode aprovar o motorista no SQL Editor:
+
+```sql
+update public.profiles
+set role = 'driver'
+where id = 'UUID_DO_USUARIO' and role_requested = 'driver';
+```
 
 ## Limitações desta versão
-Este é um MVP inicial. Ainda não inclui GPS em tempo real, mapas/rotas, cálculo automático de preço, pagamentos, chat, avaliação, verificação de documentos ou central administrativa. Combine valores e detalhes diretamente até que esses módulos sejam implementados. O cadastro como motorista ainda não representa verificação profissional.
+MVP inicial: ainda não inclui GPS em tempo real, mapas/rotas, cálculo automático de preço, pagamentos, chat, avaliação, verificação de documentos ou painel administrativo. Combine valores e detalhes da viagem diretamente até que esses módulos sejam implementados.
 
 ## Estrutura
 - `index.html` — interface
 - `styles.css` — visual responsivo
 - `app.js` — autenticação e corridas
-- `supabase-config.js` — URL e chave pública do Supabase
-- `supabase/schema.sql` — tabelas, gatilho e políticas RLS
+- `supabase-config.js` — URL e chave pública
+- `supabase/schema.sql` — esquema, gatilho e políticas RLS
